@@ -26,12 +26,17 @@
 // global variables
 // game table
 unsigned char table_array[MAX][MAX];
-// location of cursor
-int x=0, y=0;
+/// location of cursor, x
+int x=0;
+/// location of cursor, y
+int y=0;
 // flag: input mode = 0, flag mode = 1, check mode = 2
 int game_mode=0;
 
-/*This is a recursive function which uncovers blank cells while they are adjacent*/
+/**This is a recursive function which uncovers blank cells while they are adjace*nt
+* @param selected rows
+* @param selected columns
+*/
 int uncover_blank_cell(int row, int col) {
     int value, rows[8], columns[8], i;
 
@@ -125,14 +130,14 @@ void print_table() {
 int main(int argc, char *argv[]) {
 
     char ch;
-    int nMines; // the number of the remaining mines
+    int remainMines; // the number of the remaining mines
     int i,j,r,c,value, rows[8], columns[8];
 
 new_game:
     // the number of mines
-    nMines = 10;
+    remainMines = 10;
     if(argc == 2) {
-        nMines = atoi(argv[1]);
+        remainMines = atoi(argv[1]);
     }
     srand (time(NULL));						// random seed
     // setting cursor
@@ -143,8 +148,8 @@ new_game:
         for(j = 0; j < 10; j++)
             table_array[i][j] = 0;
 
-    for(i = 0; i < nMines; i++) {
-        /* initialize random seed: */
+    for(i = 0; i < remainMines; i++) {
+        /** initialize random seed: */
 
         r = rand() % 10;					// it generates a integer in the range 0 to 9
         c = rand() % 10;
@@ -186,7 +191,7 @@ new_game:
     }
 
     //
-    while(nMines != 0) {			// when nMines becomes 0 you will win the game
+    while(remainMines != 0) {			// when nMines becomes 0 you will win the game
         print_table();
 
         ch = getch();
@@ -207,14 +212,18 @@ flag_mode:
                 // arrow direction
                 if(direction == '8') {
                     // up
-                    y = (MAX + --y) % MAX;
+		    y--;
+                    y = (MAX + y) % MAX;
                 } else if(direction == '2') {
                     // down
-                    y = ++y % MAX;
+		    y++;
+                    y %= MAX;
                 } else if(direction == '4') {
-                    x = (MAX + --x) % MAX;
+		    x--;
+                    x = (MAX + x) % MAX;
                 } else if(direction == '6') {
-                    x = ++x % MAX;
+		    x++;
+                    x %= MAX;
                 } else if(direction == 'c' || direction == 'C') {
                     goto check_mode;
                 } else if(direction == '\n') {
@@ -222,14 +231,14 @@ flag_mode:
 
                     if (value == 99) {				// mine case
                         table_array[y][x] += 1;
-                        nMines -= 1;				// mine found
+                        remainMines -= 1;				// mine found
                     } else if(value >= 0 && value <= 8) {	// number of mines case (the next cell is a mine)
                         table_array[y][x] += 20;
                     } else if(value >= 20 && value <= 28) {
                         table_array[y][x] -= 20;
                     }
 
-                    if(nMines == 0)
+                    if(remainMines == 0)
                         break;
                 }
             } while (direction != 'q' && direction != 'Q');
@@ -250,14 +259,18 @@ check_mode:
                 // arrow direction
                 if(direction == '8') {
                     // up
-                    y = (MAX + --y) % MAX;
+		    y--;
+                    y = (MAX + y) % MAX;
                 } else if(direction == '2') {
                     // down
-                    y = ++y % MAX;
+		    y++;
+                    y %= MAX;
                 } else if(direction == '4') {
-                    x = (MAX + --x) % MAX;
+		    x--;
+                    x %= (MAX + x) % MAX;
                 } else if(direction == '6') {
-                    x = ++x % MAX;
+		    x++;
+                    x %= MAX;
                 } else if(direction == 'f' || direction == 'F') {
                     goto flag_mode;
                 }
@@ -301,8 +314,8 @@ end_of_game:
     print_table();
     printf("\nGAME OVER\n");
 
-    if(nMines == 0)
-        printf("you won!!!!\n");
+    if(remainMines == 0)
+        printf("Good job!!! you won!!!!\n");
 
     else
         printf("BOOM! you LOOSE!\n");
